@@ -46,10 +46,11 @@ func TestCreateArticle_Integration(t *testing.T) {
     }
 
     expectedArticle := &model.Article{
-        ID:      "1",
-        AuthorID: "author-123",
-        Title:   "Test Article",
-        Body:    "Test Body",
+        ID:         "1",
+        AuthorID:   "author-123",
+        AuthorName: "John Doe", // Add this
+        Title:      "Test Article",
+        Body:       "Test Body",
     }
 
     mockService.On("CreateArticle", mock.Anything, req).Return(expectedArticle, nil)
@@ -71,11 +72,14 @@ func TestCreateArticle_Integration(t *testing.T) {
     assert.Equal(t, "1", data["id"])
     assert.Equal(t, req.Title, data["title"])
     assert.Equal(t, req.Body, data["body"])
-    // assert.Equal(t, req.AuthorID, data["author"])
 
     authorID, ok := data["author_id"].(string)
     assert.True(t, ok, "author_id should be a string")
     assert.Equal(t, req.AuthorID, authorID)
-    
+
+    authorName, ok := data["author_name"].(string)
+    assert.True(t, ok, "author_name should be a string")
+    assert.Equal(t, "John Doe", authorName)
+
     mockService.AssertExpectations(t)
 }

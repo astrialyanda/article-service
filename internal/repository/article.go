@@ -66,14 +66,14 @@ func (r *articleRepository) GetList(ctx context.Context, req *model.GetArticlesR
     argIndex := 1
 
     if req.Query != "" {
-        conditions = append(conditions, fmt.Sprintf("(title ILIKE $%d OR body ILIKE $%d)", argIndex, argIndex))
+        conditions = append(conditions, fmt.Sprintf("(a.title ILIKE $%d OR a.body ILIKE $%d)", argIndex, argIndex))
         args = append(args, "%"+req.Query+"%")
         argIndex++
     }
 
-    if req.AuthorID != "" {
-        conditions = append(conditions, fmt.Sprintf("author_id = $%d", argIndex))
-        args = append(args, req.AuthorID)
+    if req.AuthorName != "" {
+        conditions = append(conditions, fmt.Sprintf("au.name ILIKE $%d", argIndex))
+        args = append(args, "%"+req.AuthorName+"%")
         argIndex++
     }
 
@@ -82,7 +82,12 @@ func (r *articleRepository) GetList(ctx context.Context, req *model.GetArticlesR
         whereClause = "WHERE " + strings.Join(conditions, " AND ")
     }
 
-    countQuery := fmt.Sprintf("SELECT COUNT(*) FROM articles %s", whereClause)
+    countQuery := fmt.Sprintf(`
+        SELECT COUNT(*)
+        FROM articles a
+        JOIN authors au ON a.author_id = au.id
+        %s
+    `, whereClause)
     var total int
     err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total)
     if err != nil {
@@ -91,10 +96,11 @@ func (r *articleRepository) GetList(ctx context.Context, req *model.GetArticlesR
 
     offset := (req.Page - 1) * req.Limit
     query := fmt.Sprintf(`
-        SELECT id, author_id, title, body, created_at
-        FROM articles
+        SELECT a.id, a.author_id, au.name, a.title, a.body, a.created_at
+        FROM articles a
+        JOIN authors au ON a.author_id = au.id
         %s
-        ORDER BY created_at DESC
+        ORDER BY a.created_at DESC
         LIMIT $%d OFFSET $%d
     `, whereClause, argIndex, argIndex+1)
 
@@ -109,7 +115,7 @@ func (r *articleRepository) GetList(ctx context.Context, req *model.GetArticlesR
     var articles []model.Article
     for rows.Next() {
         var article model.Article
-        err := rows.Scan(&article.ID, &article.AuthorID, &article.Title, &article.Body, &article.CreatedAt)
+        err := rows.Scan(&article.ID, &article.AuthorID, &article.AuthorName, &article.Title, &article.Body, &article.CreatedAt)
         if err != nil {
             return nil, 0, fmt.Errorf("failed to scan article: %w", err)
         }

@@ -72,13 +72,14 @@ func TestArticleService_GetArticles(t *testing.T) {
     articleService := service.NewArticleService(mockRepo)
 
     req := &model.GetArticlesRequest{
-        Page:  1,
-        Limit: 10,
+        Page:       1,
+        Limit:      10,
+        AuthorName: "John Doe",
     }
 
     expectedArticles := []model.Article{
-        {ID: "1", Title: "Article 1", Body: "Body 1", AuthorID: "author-1"},
-        {ID: "2", Title: "Article 2", Body: "Body 2", AuthorID: "author-2"},
+        {ID: "1", Title: "Article 1", Body: "Body 1", AuthorID: "author-1", AuthorName: "John Doe"},
+        {ID: "2", Title: "Article 2", Body: "Body 2", AuthorID: "author-2", AuthorName: "John Doe"},
     }
 
     mockRepo.On("GetList", mock.Anything, req).Return(expectedArticles, 2, nil)
