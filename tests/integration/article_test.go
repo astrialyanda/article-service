@@ -68,10 +68,14 @@ func TestCreateArticle_Integration(t *testing.T) {
     assert.NoError(t, err)
     
     data := response["data"].(map[string]interface{})
-    assert.Equal(t, float64(1), data["id"])
+    assert.Equal(t, "1", data["id"])
     assert.Equal(t, req.Title, data["title"])
     assert.Equal(t, req.Body, data["body"])
-    assert.Equal(t, req.AuthorID, data["author"])
+    // assert.Equal(t, req.AuthorID, data["author"])
+
+    authorID, ok := data["author_id"].(string)
+    assert.True(t, ok, "author_id should be a string")
+    assert.Equal(t, req.AuthorID, authorID)
     
     mockService.AssertExpectations(t)
 }
