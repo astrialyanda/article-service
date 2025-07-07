@@ -48,7 +48,7 @@ func TestCreateArticle_Integration(t *testing.T) {
     expectedArticle := &model.Article{
         ID:         "1",
         AuthorID:   "author-123",
-        AuthorName: "John Doe", // Add this
+        AuthorName: "John Doe",
         Title:      "Test Article",
         Body:       "Test Body",
     }

@@ -47,13 +47,13 @@ func NewArticleRepository(db *sql.DB) ArticleRepository {
 
 func (r *articleRepository) Create(ctx context.Context, article *model.Article) error {
     query := `
-        INSERT INTO articles (author_id, title, body, created_at)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id, created_at
+        INSERT INTO articles (id, author_id, title, body, created_at)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING created_at
     `
     now := time.Now()
-    err := r.db.QueryRowContext(ctx, query, article.AuthorID, article.Title, article.Body, now).
-        Scan(&article.ID, &article.CreatedAt)
+    err := r.db.QueryRowContext(ctx, query, article.ID, article.AuthorID, article.Title, article.Body, now).
+        Scan(&article.CreatedAt)
     if err != nil {
         return fmt.Errorf("failed to create article: %w", err)
     }

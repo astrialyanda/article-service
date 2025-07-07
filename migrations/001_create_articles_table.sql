@@ -17,6 +17,3 @@ CREATE INDEX idx_articles_author_id ON articles(author_id);
 CREATE INDEX idx_articles_title_gin ON articles USING gin(to_tsvector('english', title));
 CREATE INDEX idx_articles_body_gin ON articles USING gin(to_tsvector('english', body));
 
--- +goose Down
-DROP TABLE IF EXISTS articles;
-DROP TABLE IF EXISTS authors;

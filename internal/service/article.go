@@ -6,6 +6,7 @@ import (
 
     "article-service/internal/model"
     "article-service/internal/repository"
+    "github.com/google/uuid"
 )
 
 type ArticleService interface {
@@ -25,6 +26,7 @@ func NewArticleService(repo repository.ArticleRepository) ArticleService {
 
 func (s *articleService) CreateArticle(ctx context.Context, req *model.CreateArticleRequest) (*model.Article, error) {
     article := &model.Article{
+        ID:       uuid.NewString(),
         AuthorID: req.AuthorID,
         Title:    req.Title,
         Body:     req.Body,
